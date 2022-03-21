@@ -29,6 +29,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
+    # разобраться с корректным отображением величин
     LT = 'литр'
     MLT = 'милилитр'
     KG = 'килограмм'
@@ -76,6 +77,7 @@ class AmountIngredient(models.Model):
 
 
 class Formula(models.Model):
+    # проверить корректность работы полей "многие ко многим"
     author = models.ForeignKey(
         User,
         verbose_name='Автор рецепта',
