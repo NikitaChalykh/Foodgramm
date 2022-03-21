@@ -20,18 +20,59 @@ class Tag(models.Model):
         verbose_name='Слаг тега'
     )
 
+    class Meta:
+        verbose_name = "Тег"
+        verbose_name_plural = "Теги"
+
+    def __str__(self):
+        return self.title[:15]
+
 
 class Ingredient(models.Model):
-    author = models.ForeignKey(
-        User,
-        verbose_name='Автор рецепта',
-        on_delete=models.CASCADE,
-        related_name='formulas'
+    LT = 'литр'
+    MLT = 'милилитр'
+    KG = 'килограмм'
+    GR = 'грамм'
+    AMOUNT_CHOICES = (
+        (LT, 'литры'),
+        (MLT, 'милилитры'),
+        (KG, 'килограммы'),
+        (GR, 'граммы'),
     )
     title = models.CharField(
-        verbose_name='Название рецепта',
+        verbose_name='Название ингридиента',
         max_length=200
     )
+    units = models.CharField(
+        verbose_name='Единицы измерения ингридиена',
+        choices=AMOUNT_CHOICES,
+        max_length=200
+    )
+
+    class Meta:
+        verbose_name = "Ингридиент"
+        verbose_name_plural = "Ингридиенты"
+
+    def __str__(self):
+        return self.title[:15]
+
+
+class AmountIngredient(models.Model):
+    ingredient = models.ForeignKey(
+        Ingredient,
+        verbose_name='Название ингридиента рецепта',
+        on_delete=models.CASCADE
+    )
+    number = models.FloatField(
+        verbose_name='Колличество',
+    )
+
+    class Meta:
+        verbose_name = "Ингридиент в рецепте"
+        verbose_name_plural = "Ингридиенты в рецепте"
+
+    def __str__(self):
+        return self.ingredient.title[:15]
 
 
 class Formula(models.Model):
@@ -55,7 +96,7 @@ class Formula(models.Model):
         help_text='Текстовое описание рецепта'
     )
     ingredients = models.ManyToManyField(
-        Ingredient,
+        AmountIngredient,
         verbose_name='Ингридиенты рецепта'
     )
     tags = models.ManyToManyField(
