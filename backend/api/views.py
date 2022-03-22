@@ -20,3 +20,4 @@ class IngredientViewSet(
 ):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    search_fields = ('^name',)

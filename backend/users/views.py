@@ -5,9 +5,11 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from users.models import User
 from django.contrib.auth.hashers import check_password
+from rest_framework.pagination import LimitOffsetPagination
 
 from .serializers import (AuthTokenSerializer, SetPasswordSerializer,
                           UserSerializer)
+from .permissions import RetrievePermission
 
 
 class UserViewSet(
@@ -18,6 +20,8 @@ class UserViewSet(
 ):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (RetrievePermission,)
 
     @action(
         detail=False,
