@@ -1,15 +1,16 @@
+from django.contrib.auth.hashers import check_password
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action, api_view
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from users.models import User
-from django.contrib.auth.hashers import check_password
-from rest_framework.pagination import LimitOffsetPagination
 
+from users.models import User
+
+from .permissions import RetrievePermission
 from .serializers import (AuthTokenSerializer, SetPasswordSerializer,
                           UserSerializer)
-from .permissions import RetrievePermission
 
 
 class UserViewSet(
