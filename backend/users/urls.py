@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import (get_token, delete_token)
+
+from .views import delete_token, get_token
 
 app_name = 'users'
 

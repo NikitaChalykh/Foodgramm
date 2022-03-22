@@ -1,11 +1,11 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 
 User = get_user_model()
 
 
 class Tag(models.Model):
-    title = models.CharField(
+    name = models.CharField(
         verbose_name='Название тега',
         max_length=50,
         unique=True
@@ -25,29 +25,17 @@ class Tag(models.Model):
         verbose_name_plural = "Теги"
 
     def __str__(self):
-        return self.title[:15]
+        return self.name[:15]
 
 
 class Ingredient(models.Model):
-    # разобраться с корректным отображением величин
-    LT = 'литр'
-    MLT = 'милилитр'
-    KG = 'килограмм'
-    GR = 'грамм'
-    AMOUNT_CHOICES = (
-        (LT, 'литры'),
-        (MLT, 'милилитры'),
-        (KG, 'килограммы'),
-        (GR, 'граммы'),
-    )
-    title = models.CharField(
+    name = models.CharField(
         verbose_name='Название ингридиента',
         max_length=200
     )
-    units = models.CharField(
-        verbose_name='Единицы измерения ингридиена',
-        choices=AMOUNT_CHOICES,
-        max_length=200
+    measurement_unit = models.CharField(
+        verbose_name='Единицы измерения ингридиента',
+        max_length=10
     )
 
     class Meta:
@@ -55,7 +43,7 @@ class Ingredient(models.Model):
         verbose_name_plural = "Ингридиенты"
 
     def __str__(self):
-        return self.title[:15]
+        return self.name[:15]
 
 
 class AmountIngredient(models.Model):
@@ -77,7 +65,6 @@ class AmountIngredient(models.Model):
 
 
 class Formula(models.Model):
-    # проверить корректность работы полей "многие ко многим"
     author = models.ForeignKey(
         User,
         verbose_name='Автор рецепта',
@@ -105,7 +92,7 @@ class Formula(models.Model):
         Tag,
         verbose_name='Тэги рецепта'
     )
-    time = models.DurationField(
+    cooking_time = models.IntegerField(
         verbose_name='Время приготолвения рецепта',
     )
 
