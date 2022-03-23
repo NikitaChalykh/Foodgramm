@@ -1,6 +1,5 @@
-from rest_framework import mixins, viewsets
-
 from food.models import Ingredient, Tag
+from rest_framework import mixins, viewsets
 
 from .serializers import IngredientSerializer, TagSerializer
 

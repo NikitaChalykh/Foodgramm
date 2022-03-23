@@ -1,5 +1,7 @@
 import csv
+
 from food.models import Ingredient
+
 CSV_PATH = '/Users/NikitaChalykh/Dev/foodgram-project-react/data/ingredients.csv'
 
 with open(CSV_PATH, newline='', encoding='utf8') as csv_file:

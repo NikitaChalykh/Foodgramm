@@ -2,14 +2,12 @@ from django.contrib.auth.hashers import check_password
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
-from .utils import PageLimitPaginator
 from rest_framework.response import Response
-
 from users.models import User
 
 from .permissions import RetrievePermission
-from .serializers import (SetPasswordSerializer,
-                          UserSerializer)
+from .serializers import SetPasswordSerializer, UserSerializer
+from .utils import PageLimitPaginator
 
 
 class UserViewSet(
