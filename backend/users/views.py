@@ -3,12 +3,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from users.models import User
 
+from .models import Follow, User
 from .permissions import RetrievePermission
-from .serializers import (
-    SetPasswordSerializer, UserSerializer, SubscribeSerializer
-)
+from .serializers import (FollowSerializer, SetPasswordSerializer,
+                          UserSerializer)
 from .utils import PageLimitPaginator
 
 
@@ -29,7 +28,7 @@ class UserViewSet(
         permission_classes=(permissions.IsAuthenticated,)
     )
     def me(self, request):
-        serializer = UserSerializer(request.user)
+        serializer = UserSerializer(request.user, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
@@ -50,25 +49,46 @@ class UserViewSet(
         if check_password(password, user.password):
             user.set_password(new_password)
             user.save()
-            return Response(
-                'Пароль измененен', status=status.HTTP_204_NO_CONTENT
-            )
-        return Response(
-            'Неверный пароль', status=status.HTTP_400_BAD_REQUEST
-        )
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
         detail=False,
-        methods=['GET']
+        methods=['GET'],
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def subscriptions(self, request):
-        pass
+        queryset = request.user.follower.all()
+        serializer = FollowSerializer(
+            queryset,
+            context={'request': request},
+            many=True
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class SubscribeViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
-    queryset = User.objects.all()
-    serializer_class = SubscribeSerializer
+class SubscribeViewSet(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def create(self, request, user_id):
+        follow_author = get_object_or_404(User, pk=user_id)
+        if follow_author != request.user and (
+            not request.user.follower.filter(author=follow_author).exists()
+        ):
+            Follow.objects.create(
+                user=request.user,
+                author=follow_author
+            )
+            serializer = UserSerializer(
+                follow_author, context={'request': request}
+            )
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, user_id):
+        follow_author = get_object_or_404(User, pk=user_id)
+        data_follow = request.user.follower.filter(author=follow_author)
+        if data_follow.exists():
+            data_follow.delete()
+            return Response(status.HTTP_204_NO_CONTENT)
+        return Response(status.HTTP_400_BAD_REQUEST)

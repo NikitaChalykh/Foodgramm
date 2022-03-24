@@ -27,7 +27,7 @@ class CustomUser(AbstractUser):
         verbose_name_plural = "Пользователи"
 
     def __str__(self):
-        return self.username[:15]
+        return self.email[:15]
 
 
 User = get_user_model()

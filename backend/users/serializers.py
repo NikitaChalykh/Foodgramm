@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from users.models import User
+from users.models import Follow, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -13,10 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        if (
-            self.context.get('request')
-            and self.context['request'].user.is_authenticated
-        ):
+        if (self.context['request'].user.is_authenticated):
             return obj.following.filter(
                 user=self.context['request'].user
             ).exists()
@@ -34,5 +31,6 @@ class SetPasswordSerializer(serializers.Serializer):
     current_password = serializers.CharField(max_length=150)
 
 
-class SubscribeSerializer(serializers.Serializer):
+class FollowSerializer(UserSerializer):
+    model = Follow
     pass
