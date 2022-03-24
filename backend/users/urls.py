@@ -1,10 +1,9 @@
-# from django.urls import path
+from django.urls import path
+from djoser.views import TokenCreateView, TokenDestroyView
 
-# from .views import delete_token, get_token
+app_name = 'users'
 
-# app_name = 'users'
-
-# urlpatterns = [
-#     path('login/', get_token, name='get_token'),
-#     path('logout/', delete_token, name='delete_token')
-# ]
+urlpatterns = [
+    path('token/login/', TokenCreateView.as_view(), name='token_login'),
+    path('token/logout/', TokenDestroyView.as_view(), name='token_logout')
+]
