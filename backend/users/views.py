@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from .models import Follow, User
 from .permissions import RetrievePermission
-from .serializers import (FollowSerializer, SetPasswordSerializer,
+from .serializers import (SetPasswordSerializer,
                           UserSerializer)
 from .utils import PageLimitPaginator
 
@@ -58,8 +58,8 @@ class UserViewSet(
         permission_classes=(permissions.IsAuthenticated,)
     )
     def subscriptions(self, request):
-        queryset = request.user.follower.all()
-        serializer = FollowSerializer(
+        queryset = User.objects.filter(following__user=request.user)
+        serializer = UserSerializer(
             queryset,
             context={'request': request},
             many=True

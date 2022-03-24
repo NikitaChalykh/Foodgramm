@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from users.models import Follow, User
+from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -29,8 +29,3 @@ class UserSerializer(serializers.ModelSerializer):
 class SetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(max_length=150)
     current_password = serializers.CharField(max_length=150)
-
-
-class FollowSerializer(UserSerializer):
-    model = Follow
-    pass
