@@ -64,12 +64,12 @@ class AmountIngredient(models.Model):
         return self.ingredient.title[:15]
 
 
-class Formula(models.Model):
+class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         verbose_name='Автор рецепта',
         on_delete=models.CASCADE,
-        related_name='formulas'
+        related_name='recipe'
     )
     title = models.CharField(
         verbose_name='Название рецепта',
@@ -77,7 +77,7 @@ class Formula(models.Model):
     )
     image = models.ImageField(
         verbose_name='Картинка рецепта',
-        upload_to='formulas/',
+        upload_to='recipes/',
         help_text='Загрузите сюда картинку вашего рецепта'
     )
     text = models.TextField(
@@ -93,7 +93,7 @@ class Formula(models.Model):
         verbose_name='Тэги рецепта'
     )
     cooking_time = models.IntegerField(
-        verbose_name='Время приготолвения рецепта',
+        verbose_name='Время приготовления рецепта',
     )
 
     class Meta:
@@ -102,3 +102,47 @@ class Formula(models.Model):
 
     def __str__(self):
         return self.title[:15]
+
+
+class FavoriteRecipe(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='cook',
+        verbose_name='Пользователь'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='favorite_recipes',
+        verbose_name='Избранный рецепт'
+    )
+
+    class Meta:
+        verbose_name = "Избранный рецепт"
+        verbose_name_plural = "Избранные рецепты"
+
+    def __str__(self):
+        return self.user.username[:15]
+
+
+class ShoppingList(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='buyer',
+        verbose_name='Пользователь'
+    )
+    ingridient = models.ForeignKey(
+        AmountIngredient,
+        on_delete=models.CASCADE,
+        related_name='favorite_recipes',
+        verbose_name='Ингридиент для покупки'
+    )
+
+    class Meta:
+        verbose_name = "Список покупок"
+        verbose_name_plural = "Список покупок"
+
+    def __str__(self):
+        return self.user.username[:15]
