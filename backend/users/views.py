@@ -6,7 +6,8 @@ from rest_framework.response import Response
 
 from .models import Follow, User
 from .permissions import RetrievePermission
-from .serializers import SetPasswordSerializer, UserSerializer
+from .serializers import (FollowSerializer, SetPasswordSerializer,
+                          UserSerializer)
 from .utils import PageLimitPaginator
 
 
@@ -62,9 +63,13 @@ class UserViewSet(
         ).order_by('pk')
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            serializer = FollowSerializer(
+                page, many=True, context={'request': request}
+            )
             return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = FollowSerializer(
+            queryset, many=True, context={'request': request}
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -80,7 +85,7 @@ class SubscribeViewSet(viewsets.ViewSet):
                 user=request.user,
                 author=follow_author
             )
-            serializer = UserSerializer(
+            serializer = FollowSerializer(
                 follow_author, context={'request': request}
             )
             return Response(serializer.data, status.HTTP_201_CREATED)
