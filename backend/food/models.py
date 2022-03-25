@@ -52,7 +52,7 @@ class AmountIngredient(models.Model):
         verbose_name='Название ингридиента рецепта',
         on_delete=models.CASCADE
     )
-    number = models.FloatField(
+    amount = models.FloatField(
         verbose_name='Колличество',
     )
 

@@ -42,7 +42,7 @@ class UserViewSet(
         new_password = serializer.validated_data['new_password']
         username = request.user.username
         user = get_object_or_404(
-            User,
+            self.get_queryset(),
             username=username
         )
         if check_password(password, user.password):
@@ -57,12 +57,13 @@ class UserViewSet(
         permission_classes=(permissions.IsAuthenticated,),
     )
     def subscriptions(self, request):
-        queryset = User.objects.filter(following__user=request.user)
+        queryset = self.get_queryset().filter(
+            following__user=request.user
+        ).order_by('pk')
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
