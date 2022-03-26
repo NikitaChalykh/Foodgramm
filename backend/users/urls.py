@@ -8,7 +8,7 @@ app_name = 'users'
 
 router_users = routers.DefaultRouter()
 
-router_users.register('users', UserViewSet, basename='users2')
+router_users.register('users', UserViewSet)
 
 urlpatterns = [
     path('', include(router_users.urls)),

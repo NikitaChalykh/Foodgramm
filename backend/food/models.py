@@ -71,7 +71,7 @@ class Recipe(models.Model):
         on_delete=models.CASCADE,
         related_name='recipes'
     )
-    title = models.CharField(
+    name = models.CharField(
         verbose_name='Название рецепта',
         max_length=200
     )
