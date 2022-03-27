@@ -9,10 +9,6 @@ class CustomUser(AbstractUser):
         unique=True,
         verbose_name='Электронная почта'
     )
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
-
     first_name = models.CharField(
         max_length=150,
         verbose_name='Имя'
@@ -27,7 +23,7 @@ class CustomUser(AbstractUser):
         verbose_name_plural = "Пользователи"
 
     def __str__(self):
-        return self.email[:15]
+        return self.username
 
 
 User = get_user_model()
@@ -50,7 +46,7 @@ class Follow(models.Model):
     class Meta:
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
-        ordering = ['author']
+        ordering = ['user']
 
     def __str__(self):
-        return self.user.username[:15]
+        return self.user.username

@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        if (self.context['request'].user.is_authenticated):
+        if self.context['request'].user.is_authenticated:
             return obj.following.filter(
                 user=self.context['request'].user
             ).exists()
@@ -43,12 +43,12 @@ class FollowSerializer(UserSerializer):
         recipes_limit = (
             self.context['request'].query_params.get('recipes_limit')
         )
-        queryset = obj.recipes.all()
+        recipes = obj.recipes.all()
         if recipes_limit is not None:
             recipes_limit = int(recipes_limit)
-            serializer = RecipeSerializer(queryset[:recipes_limit], many=True)
+            serializer = RecipeSerializer(recipes[:recipes_limit], many=True)
         else:
-            serializer = RecipeSerializer(queryset, many=True)
+            serializer = RecipeSerializer(recipes, many=True)
         return serializer.data
 
     def get_recipes_count(self, obj):

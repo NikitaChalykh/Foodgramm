@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import Follow, User
-from .permissions import RetrievePermission
+from .permissions import UserPermission
 from .serializers import (FollowSerializer, SetPasswordSerializer,
                           UserSerializer)
 from .utils import PageLimitPaginator
@@ -20,7 +20,7 @@ class UserViewSet(
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = PageLimitPaginator
-    permission_classes = (RetrievePermission,)
+    permission_classes = (UserPermission,)
 
     @action(
         detail=False,
