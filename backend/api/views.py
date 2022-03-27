@@ -46,7 +46,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         pass
-        # достать тут кверисет всех ингридентов избранных рецептов
+        # queryset = self.get_queryset().filter(
+        #     shopping_list_recipes__user=request.user
+        # )
+        # shopping_cart_dict = queryset.values()
+        # for position in shopping_cart_dict:
 
 
 class ShoppingCartViewSet(viewsets.ViewSet):
@@ -71,19 +75,19 @@ class ShoppingCartViewSet(viewsets.ViewSet):
         recipe_in_shopping_cart = get_object_or_404(Recipe, pk=id)
         data_shopping_list = (
             recipe_in_shopping_cart.shopping_list_recipes.filter(
-                author=request.user
+                user=request.user
             )
         )
         if data_shopping_list.exists():
             data_shopping_list.delete()
-            return Response(status.HTTP_204_NO_CONTENT)
-        return Response(status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class FavoriteViewSet(viewsets.ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
 
-    def create(self, request, user_id):
+    def create(self, request, id):
         favorite_recipe = get_object_or_404(Recipe, pk=id)
         if not favorite_recipe.favorite_recipes.filter(
             user=request.user
@@ -102,10 +106,10 @@ class FavoriteViewSet(viewsets.ViewSet):
         favorite_recipe = get_object_or_404(Recipe, pk=id)
         data_favorite = (
             favorite_recipe.favorite_recipes.filter(
-                author=request.user
+                user=request.user
             )
         )
         if data_favorite.exists():
             data_favorite.delete()
-            return Response(status.HTTP_204_NO_CONTENT)
-        return Response(status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

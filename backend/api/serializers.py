@@ -18,7 +18,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    # настрой все поля сериализатора (картинки и все такое)
 
     class Meta:
         model = Recipe
