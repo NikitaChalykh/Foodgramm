@@ -41,6 +41,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = "Ингредиент"
         verbose_name_plural = "Ингредиенты"
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -60,6 +61,7 @@ class AmountIngredient(models.Model):
         verbose_name = "Ингредиент с количеством"
         verbose_name_plural = "Ингредиенты с количеством"
         ordering = ['ingredient']
+        unique_together = ('ingredient', 'amount')
 
     def __str__(self):
         return self.ingredient.name

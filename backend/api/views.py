@@ -1,9 +1,12 @@
+from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from food.models import FavoriteRecipe, Ingredient, Recipe, ShoppingList, Tag
+from food.models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
+                         ShoppingList, Tag)
 
 from .serializers import (FullRecipeSerializer, IngredientSerializer,
                           ReadFullRecipeSerializer, RecipeSerializer,
@@ -45,12 +48,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated,),
     )
     def download_shopping_cart(self, request):
-        pass
-        # queryset = self.get_queryset().filter(
-        #     shopping_list_recipes__user=request.user
-        # )
-        # shopping_cart_dict = queryset.values()
-        # for position in shopping_cart_dict:
+        shopping_list = AmountIngredient.objects.filter(
+            recipes__shopping_list_recipes__user=request.user
+        )
+        shopping_list = shopping_list.values('ingredient').annotate(
+            average_amount=Sum('amount')
+        )
+        with open("shopping_list.txt", "w") as file:
+            for position in shopping_list:
+                position_ingredient = Ingredient.objects.get(
+                    pk=position['ingredient']
+                )
+                position_amount = position['average_amount']
+                file.write(
+                    f' *  {position_ingredient.name.title()}'
+                    f' ({position_ingredient.measurement_unit})'
+                    f' - {position_amount}' + '\n'
+                )
+        file = open('shopping_list.txt')
+        response = HttpResponse(file, content_type='text')
+        response['Content-Disposition'] = (
+            'attachment; filename="%s"' % 'shopping_list.txt'
+        )
+        return response
 
 
 class ShoppingCartViewSet(viewsets.ViewSet):
