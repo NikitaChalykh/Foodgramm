@@ -131,6 +131,6 @@ dmypy.json
 # .idea
 .idea
 
-shopping_list
+shopping_list.txt
 data_script
 /static
