@@ -5,7 +5,7 @@ from .models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    readonly_fields = ('count_of_favorite_recipe',)
+    readonly_fields = ('Добавлен_в_избранное',)
     list_display = (
         'name',
         'author'
@@ -14,7 +14,7 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     empty_value_display = '-пусто-'
 
-    def count_of_favorite_recipe(self, instance):
+    def Добавлен_в_избранное(self, instance):
         return instance.favorite_recipes.count()
 
 

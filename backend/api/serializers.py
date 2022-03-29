@@ -136,7 +136,7 @@ class FullRecipeSerializer(serializers.ModelSerializer):
         if (
             self.context['request'].user.is_authenticated
             and obj.shopping_list_recipes.filter(
-                suser=self.context['request'].user
+                user=self.context['request'].user
             ).exists()
         ):
             return True

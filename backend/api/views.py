@@ -149,9 +149,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 author=recipes_author
             )
         if recipes_tags != []:
-
+            regular_tags = '|'.join(recipes_tags)
             review_queryset = review_queryset.filter(
-                tags__slug__regex=recipes_tags
+                tags__slug__regex=regular_tags
             )
         return review_queryset
 

@@ -3,6 +3,7 @@ import csv
 from food.models import Ingredient
 
 CSV_PATH = (
+    # путь указать для своего репозитория
     '/Users/NikitaChalykh/Dev/foodgram-project-react/data/ingredients.csv'
 )
 
