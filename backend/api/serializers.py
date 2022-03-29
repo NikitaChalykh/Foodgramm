@@ -1,5 +1,6 @@
-from food.models import AmountIngredient, Ingredient, Recipe, Tag
 from rest_framework import serializers
+
+from food.models import AmountIngredient, Ingredient, Recipe, Tag
 from users.models import User
 
 
