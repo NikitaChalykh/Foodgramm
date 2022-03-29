@@ -58,8 +58,8 @@ class AmountIngredient(models.Model):
     )
 
     class Meta:
-        verbose_name = "Ингредиент с количеством"
-        verbose_name_plural = "Ингредиенты с количеством"
+        verbose_name = "Ингредиент в рецептах с количеством"
+        verbose_name_plural = "Ингредиенты в рецептах с количеством"
         ordering = ['ingredient']
         unique_together = ('ingredient', 'amount')
 

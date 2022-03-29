@@ -1,16 +1,108 @@
+from django.contrib.auth.hashers import check_password
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from food.models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
+                         ShoppingList, Tag)
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from users.models import Follow, User
 
-from food.models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
-                         ShoppingList, Tag)
+from .permissions import RecipePermission, UserPermission
+from .serializers import (FollowSerializer, FullRecipeSerializer,
+                          IngredientSerializer, PasswordSerializer,
+                          SmallRecipeSerializer, TagSerializer, UserSerializer)
+from .utils import PageLimitPaginator
 
-from .serializers import (FullRecipeSerializer, IngredientSerializer,
-                          ReadFullRecipeSerializer, RecipeSerializer,
-                          TagSerializer)
+
+class UserViewSet(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    pagination_class = PageLimitPaginator
+    permission_classes = (UserPermission,)
+
+    @action(
+        detail=False,
+        methods=['GET'],
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def me(self, request):
+        serializer = UserSerializer(request.user, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(
+        detail=False,
+        methods=['POST'],
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def set_password(self, request):
+        serializer = PasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        password = serializer.validated_data['current_password']
+        new_password = serializer.validated_data['new_password']
+        username = request.user.username
+        user = get_object_or_404(
+            self.get_queryset(),
+            username=username
+        )
+        if check_password(password, user.password):
+            user.set_password(new_password)
+            user.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        detail=False,
+        methods=['GET'],
+        permission_classes=(permissions.IsAuthenticated,),
+    )
+    def subscriptions(self, request):
+        queryset = self.get_queryset().filter(
+            following__user=request.user
+        ).order_by('pk')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = FollowSerializer(
+                page, many=True, context={'request': request}
+            )
+            return self.get_paginated_response(serializer.data)
+        serializer = FollowSerializer(
+            queryset, many=True, context={'request': request}
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class FollowViewSet(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def create(self, request, user_id):
+        follow_author = get_object_or_404(User, pk=user_id)
+        if follow_author != request.user and (
+            not request.user.follower.filter(author=follow_author).exists()
+        ):
+            Follow.objects.create(
+                user=request.user,
+                author=follow_author
+            )
+            serializer = FollowSerializer(
+                follow_author, context={'request': request}
+            )
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, user_id):
+        follow_author = get_object_or_404(User, pk=user_id)
+        data_follow = request.user.follower.filter(author=follow_author)
+        if data_follow.exists():
+            data_follow.delete()
+            return Response(status.HTTP_204_NO_CONTENT)
+        return Response(status.HTTP_400_BAD_REQUEST)
 
 
 class TagViewSet(
@@ -22,25 +114,46 @@ class TagViewSet(
     serializer_class = TagSerializer
 
 
-class IngredientViewSet(
-    mixins.RetrieveModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet
-):
+class IngredientViewSet(TagViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     search_fields = ('^name',)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    # доработать вьюсет рецептов
     queryset = Recipe.objects.all()
-    serializer_class = ReadFullRecipeSerializer
+    serializer_class = FullRecipeSerializer
+    pagination_class = PageLimitPaginator
+    permission_classes = (RecipePermission,)
 
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return FullRecipeSerializer
-        return ReadFullRecipeSerializer
+    def get_queryset(self):
+        is_favorited = self.request.query_params.get('is_favorited')
+        is_in_shopping_cart = self.request.query_params.get(
+            'is_in_shopping_cart'
+        )
+        recipes_author = self.request.query_params.get('author')
+        recipes_tags = self.request.query_params.getlist('tags')
+        review_queryset = Recipe.objects.all()
+        if is_favorited == 1:
+            if self.request.user.is_authenticated:
+                review_queryset = review_queryset.filter(
+                    favorite_recipes__user=self.request.user
+                )
+        if is_in_shopping_cart == 1:
+            if self.request.user.is_authenticated:
+                review_queryset = review_queryset.filter(
+                    shopping_list_recipes__user=self.request.user
+                )
+        if recipes_author is not None:
+            review_queryset = review_queryset.filter(
+                author=recipes_author
+            )
+        if recipes_tags != []:
+
+            review_queryset = review_queryset.filter(
+                tags__slug__regex=recipes_tags
+            )
+        return review_queryset
 
     @action(
         detail=False,
@@ -85,7 +198,7 @@ class ShoppingCartViewSet(viewsets.ViewSet):
                 user=request.user,
                 recipe=recipe_in_shopping_cart
             )
-            serializer = RecipeSerializer(
+            serializer = SmallRecipeSerializer(
                 recipe_in_shopping_cart, context={'request': request}
             )
             return Response(serializer.data, status.HTTP_201_CREATED)
@@ -116,7 +229,7 @@ class FavoriteViewSet(viewsets.ViewSet):
                 user=request.user,
                 recipe=favorite_recipe
             )
-            serializer = RecipeSerializer(
+            serializer = SmallRecipeSerializer(
                 favorite_recipe, context={'request': request}
             )
             return Response(serializer.data, status.HTTP_201_CREATED)
