@@ -1,5 +1,6 @@
-from food.models import AmountIngredient, Ingredient, Recipe, Tag
 from rest_framework import serializers
+
+from food.models import AmountIngredient, Ingredient, Recipe, Tag
 from users.models import User
 
 
@@ -141,3 +142,12 @@ class FullRecipeSerializer(serializers.ModelSerializer):
         ):
             return True
         return False
+
+    # def create(self, validated_data):
+    #     author = self.context['request'].user
+    #     ingredients = self.initial_data['ingredients'][]
+    #     tags = self.initial_data['tags'][0]
+    #     query_tag = Tag.obkects.get(id=tags)
+    #     recipe = Recipe.objects.create(**validated_data, author=author,
+    # tags=query_tag, ingredients=)
+    #     return recipe

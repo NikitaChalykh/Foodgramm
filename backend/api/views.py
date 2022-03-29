@@ -1,12 +1,13 @@
 from django.contrib.auth.hashers import check_password
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from food.models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
-                         ShoppingList, Tag)
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from food.models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
+                         ShoppingList, Tag)
 from users.models import Follow, User
 
 from .permissions import RecipePermission, UserPermission
@@ -134,24 +135,27 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipes_author = self.request.query_params.get('author')
         recipes_tags = self.request.query_params.getlist('tags')
         review_queryset = Recipe.objects.all()
-        if is_favorited == 1:
-            if self.request.user.is_authenticated:
-                review_queryset = review_queryset.filter(
-                    favorite_recipes__user=self.request.user
-                )
-        if is_in_shopping_cart == 1:
-            if self.request.user.is_authenticated:
-                review_queryset = review_queryset.filter(
-                    shopping_list_recipes__user=self.request.user
-                )
+        if is_favorited == '1':
+            review_queryset = review_queryset.filter(
+                favorite_recipes__user=self.request.user
+            )
+        if is_in_shopping_cart == '1':
+            review_queryset = review_queryset.filter(
+                shopping_list_recipes__user=self.request.user
+            )
         if recipes_author is not None:
             review_queryset = review_queryset.filter(
                 author=recipes_author
             )
         if recipes_tags != []:
-            regular_tags = '|'.join(recipes_tags)
+            data_tags = [None, None, None]
+            i = 0
+            for tags in recipes_tags:
+                data_tags[i] = tags
             review_queryset = review_queryset.filter(
-                tags__slug__regex=regular_tags
+                Q(tags__slug=data_tags[0])
+                | Q(tags__slug=data_tags[1])
+                | Q(tags__slug=data_tags[2])
             )
         return review_queryset
 
