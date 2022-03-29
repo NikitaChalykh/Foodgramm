@@ -149,5 +149,5 @@ class FullRecipeSerializer(serializers.ModelSerializer):
     #     tags = self.initial_data['tags'][0]
     #     query_tag = Tag.obkects.get(id=tags)
     #     recipe = Recipe.objects.create(**validated_data, author=author,
-    # tags=query_tag, ingredients=)
+    #       tags=query_tag, ingredients=)
     #     return recipe

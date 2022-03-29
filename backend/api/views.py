@@ -1,5 +1,5 @@
 from django.contrib.auth.hashers import check_password
-from django.db.models import Q, Sum
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, permissions, status, viewsets
@@ -148,15 +148,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 author=recipes_author
             )
         if recipes_tags != []:
-            data_tags = [None, None, None]
-            i = 0
-            for tags in recipes_tags:
-                data_tags[i] = tags
+            regular_tags = '|'.join(recipes_tags)
             review_queryset = review_queryset.filter(
-                Q(tags__slug=data_tags[0])
-                | Q(tags__slug=data_tags[1])
-                | Q(tags__slug=data_tags[2])
+                tags__slug__regex=regular_tags
             )
+            review_queryset = review_queryset.distinct()
         return review_queryset
 
     @action(
