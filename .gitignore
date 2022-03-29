@@ -133,4 +133,4 @@ dmypy.json
 
 shopping_list.txt
 data_script
-/static
+backend/static
