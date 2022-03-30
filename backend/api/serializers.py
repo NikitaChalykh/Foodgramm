@@ -1,6 +1,6 @@
-from rest_framework import serializers
-
+from drf_extra_fields.fields import Base64ImageField
 from food.models import AmountIngredient, Ingredient, Recipe, Tag
+from rest_framework import serializers
 from users.models import User
 
 
@@ -108,12 +108,12 @@ class SmallRecipeSerializer(serializers.ModelSerializer):
 
 
 class FullRecipeSerializer(serializers.ModelSerializer):
-    # доделай работу сериалайзера на сохранение данных
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     tags = TagSerializer(read_only=True, many=True)
     author = UserSerializer(read_only=True)
     ingredients = AmountIngredientSerializer(read_only=True, many=True)
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe
@@ -143,11 +143,55 @@ class FullRecipeSerializer(serializers.ModelSerializer):
             return True
         return False
 
-    # def create(self, validated_data):
-    #     author = self.context['request'].user
-    #     ingredients = self.initial_data['ingredients'][]
-    #     tags = self.initial_data['tags'][0]
-    #     query_tag = Tag.obkects.get(id=tags)
-    #     recipe = Recipe.objects.create(**validated_data, author=author,
-    #       tags=query_tag, ingredients=)
-    #     return recipe
+    def create(self, validated_data):
+        author = self.context['request'].user
+        ingredients = self.initial_data['ingredients']
+        tags = self.initial_data['tags']
+
+        queryset_tags = []
+        for tag in tags:
+            queryset_tags.append(Tag.objects.get(id=tag))
+
+        queryset_amount_ingredients = []
+        for new_ingredient in ingredients:
+            ingredient = Ingredient.objects.get(id=new_ingredient['id'])
+            amount_ingredient = AmountIngredient.objects.create(
+                ingredient=ingredient,
+                amount=new_ingredient['amount']
+            )
+            amount_ingredient.save()
+            queryset_amount_ingredients.append(amount_ingredient)
+
+        recipe = Recipe.objects.create(
+            **validated_data,
+            author=author
+        )
+        recipe.tags.set(queryset_tags)
+        recipe.ingredients.set(queryset_amount_ingredients)
+        return recipe
+
+    def update(self, instance, validated_data):
+        ingredients = self.initial_data['ingredients']
+        tags = self.initial_data['tags']
+        queryset_tags = []
+        for tag in tags:
+            queryset_tags.append(Tag.objects.get(id=tag))
+        queryset_amount_ingredients = []
+        old_amount_ingredients = AmountIngredient.objects.filter(
+            recipes=instance
+        )
+        old_amount_ingredients.delete()
+        for new_ingredient in ingredients:
+            ingredient = Ingredient.objects.get(id=new_ingredient['id'])
+            amount_ingredient = AmountIngredient.objects.create(
+                ingredient=ingredient,
+                amount=new_ingredient['amount']
+            )
+            amount_ingredient.save()
+            queryset_amount_ingredients.append(amount_ingredient)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        instance.tags.set(queryset_tags)
+        instance.ingredients.set(queryset_amount_ingredients)
+        return instance

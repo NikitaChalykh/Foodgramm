@@ -61,7 +61,6 @@ class AmountIngredient(models.Model):
         verbose_name = "Ингредиент в рецептах с количеством"
         verbose_name_plural = "Ингредиенты в рецептах с количеством"
         ordering = ['ingredient']
-        unique_together = ('ingredient', 'amount')
 
     def __str__(self):
         return self.ingredient.name
@@ -72,7 +71,7 @@ class Recipe(models.Model):
         User,
         verbose_name='Автор рецепта',
         on_delete=models.CASCADE,
-        related_name='recipes'
+        related_name='recipes',
     )
     name = models.CharField(
         verbose_name='Название рецепта',
@@ -90,7 +89,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         AmountIngredient,
         related_name='recipes',
-        verbose_name='Ингредиенты рецепта'
+        verbose_name='Ингредиенты рецепта',
     )
     tags = models.ManyToManyField(
         Tag,

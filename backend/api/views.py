@@ -2,12 +2,11 @@ from django.contrib.auth.hashers import check_password
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from food.models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
+                         ShoppingList, Tag)
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
-from food.models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
-                         ShoppingList, Tag)
 from users.models import Follow, User
 
 from .permissions import RecipePermission, UserPermission
@@ -118,7 +117,16 @@ class TagViewSet(
 class IngredientViewSet(TagViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    search_fields = ('^name',)
+
+    def get_queryset(self):
+        name = self.request.query_params.get('name')
+        ingredient_queryset = Ingredient.objects.all()
+        if name is not None:
+            regular_name = '^' + name
+            ingredient_queryset = Ingredient.objects.filter(
+                name__regex=regular_name
+            )
+        return ingredient_queryset
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -154,6 +162,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
             review_queryset = review_queryset.distinct()
         return review_queryset
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        old_amount_ingredients = AmountIngredient.objects.filter(
+            recipes=instance
+        )
+        old_amount_ingredients.delete()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=False,
