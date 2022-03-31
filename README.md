@@ -65,3 +65,4 @@ cd ../infra
 
 docker-compose up -d
 ```
+8. Проект на локальной машине доступен по адресу ```http://localhost```.
