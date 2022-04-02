@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from .validators import validate_not_negativ_value
+from .validators import validate_not_negative_value
 
 User = get_user_model()
 
@@ -27,7 +27,7 @@ class Tag(models.Model):
         verbose_name_plural = "Теги"
 
     def __str__(self):
-        return self.name
+        return self.slug
 
 
 class Ingredient(models.Model):
@@ -56,7 +56,7 @@ class AmountIngredient(models.Model):
         on_delete=models.CASCADE
     )
     amount = models.IntegerField(
-        validators=[validate_not_negativ_value],
+        validators=[validate_not_negative_value],
         verbose_name='Количество ингредиента'
     )
 
@@ -64,6 +64,12 @@ class AmountIngredient(models.Model):
         verbose_name = "Ингредиент в рецептах с количеством"
         verbose_name_plural = "Ингредиенты в рецептах с количеством"
         ordering = ['ingredient']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'amount'],
+                name='unique_amountingredient_model'
+            )
+        ]
 
     def __str__(self):
         return self.ingredient.name
@@ -92,7 +98,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         AmountIngredient,
         related_name='recipes',
-        verbose_name='Ингредиенты рецепта',
+        verbose_name='Ингредиенты рецепта'
     )
     tags = models.ManyToManyField(
         Tag,
@@ -100,7 +106,7 @@ class Recipe(models.Model):
         verbose_name='Тэги рецепта'
     )
     cooking_time = models.IntegerField(
-        validators=[validate_not_negativ_value],
+        validators=[validate_not_negative_value],
         verbose_name='Время приготовления рецепта'
     )
     pub_date = models.DateTimeField(

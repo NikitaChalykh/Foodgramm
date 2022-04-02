@@ -13,8 +13,9 @@ from users.models import Follow, User
 from .permissions import RecipePermission, UserPermission
 from .serializers import (FollowSerializer, FullRecipeSerializer,
                           IngredientSerializer, PasswordSerializer,
-                          SmallRecipeSerializer, TagSerializer, UserSerializer)
-from .utils import PageLimitPaginator
+                          RecordRecipeSerializer, SmallRecipeSerializer,
+                          TagSerializer, UserSerializer)
+from .utils import PageLimitPaginator, delete_ingredients_in_recipe
 
 
 class UserViewSet(
@@ -135,6 +136,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = PageLimitPaginator
     permission_classes = (RecipePermission,)
 
+    def get_serializer_class(self):
+        if self.action == 'create' or self.action == 'partial_update':
+            return RecordRecipeSerializer
+        return FullRecipeSerializer
+
     def get_queryset(self):
         is_favorited = self.request.query_params.get('is_favorited')
         is_in_shopping_cart = self.request.query_params.get(
@@ -164,10 +170,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        old_amount_ingredients = AmountIngredient.objects.filter(
-            recipes=instance
-        )
-        old_amount_ingredients.delete()
+        delete_ingredients_in_recipe(instance)
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 

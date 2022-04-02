@@ -1,8 +1,11 @@
+from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 from food.models import AmountIngredient, Ingredient, Recipe, Tag
 from users.models import User
+
+from .utils import delete_ingredients_in_recipe
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -82,7 +85,7 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit')
 
 
-class AmountIngredientSerializer(serializers.ModelSerializer):
+class FullAmountIngredientSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='ingredient.id')
     name = serializers.CharField(source='ingredient.name')
     measurement_unit = serializers.CharField(
@@ -92,6 +95,13 @@ class AmountIngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = AmountIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
+
+
+class AmountIngredientSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AmountIngredient
+        fields = ('ingredient', 'amount')
 
 
 class SmallRecipeSerializer(serializers.ModelSerializer):
@@ -104,10 +114,10 @@ class SmallRecipeSerializer(serializers.ModelSerializer):
 class FullRecipeSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
-    tags = TagSerializer(read_only=True, many=True)
-    author = UserSerializer(read_only=True)
-    ingredients = AmountIngredientSerializer(read_only=True, many=True)
     image = Base64ImageField()
+    author = UserSerializer(read_only=True)
+    tags = TagSerializer(read_only=True, many=True)
+    ingredients = FullAmountIngredientSerializer(read_only=True, many=True)
 
     class Meta:
         model = Recipe
@@ -137,25 +147,51 @@ class FullRecipeSerializer(serializers.ModelSerializer):
             return True
         return False
 
-    def create(self, validated_data):
-        author = self.context['request'].user
-        ingredients = self.initial_data['ingredients']
-        tags = self.initial_data['tags']
 
+class RecordRecipeSerializer(FullRecipeSerializer):
+    # доработать сохранение и изменение объектов
+    tags = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Tag.objects.all(),
+        required=True
+    )
+    ingredients = AmountIngredientSerializer(many=True)
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id', 'tags', 'author', 'ingredients',
+            'is_favorited', 'is_in_shopping_cart', 'name',
+            'image', 'text', 'cooking_time'
+        )
+
+    def taking_tags(self, validated_data):
+        tags = validated_data.pop('tags')
         queryset_tags = []
         for tag in tags:
-            queryset_tags.append(Tag.objects.get(id=tag))
+            queryset_tags.append(get_object_or_404(Tag, id=tag))
+        return queryset_tags
 
+    def taking_ingredients(self, validated_data):
+        ingredients = validated_data.pop('ingredients2')
         queryset_amount_ingredients = []
         for new_ingredient in ingredients:
-            ingredient = Ingredient.objects.get(id=new_ingredient['id'])
-            amount_ingredient = AmountIngredient.objects.create(
-                ingredient=ingredient,
-                amount=new_ingredient['amount']
+            ingredient = get_object_or_404(Ingredient, id=new_ingredient['id'])
+            amount_ingredient, created = (
+                AmountIngredient.objects.get_or_create(
+                    ingredient=ingredient,
+                    amount=new_ingredient['amount']
+                )
             )
-            amount_ingredient.save()
+            if created:
+                amount_ingredient.save()
             queryset_amount_ingredients.append(amount_ingredient)
+        return queryset_amount_ingredients
 
+    def create(self, validated_data):
+        author = self.context['request'].user
+        queryset_tags = self.taking_tags(validated_data)
+        queryset_amount_ingredients = self.taking_ingredients(validated_data)
         recipe = Recipe.objects.create(
             **validated_data,
             author=author
@@ -165,24 +201,11 @@ class FullRecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients = self.initial_data['ingredients']
-        tags = self.initial_data['tags']
-        queryset_tags = []
-        for tag in tags:
-            queryset_tags.append(Tag.objects.get(id=tag))
-        queryset_amount_ingredients = []
-        old_amount_ingredients = AmountIngredient.objects.filter(
-            recipes=instance
-        )
-        old_amount_ingredients.delete()
-        for new_ingredient in ingredients:
-            ingredient = Ingredient.objects.get(id=new_ingredient['id'])
-            amount_ingredient = AmountIngredient.objects.create(
-                ingredient=ingredient,
-                amount=new_ingredient['amount']
-            )
-            amount_ingredient.save()
-            queryset_amount_ingredients.append(amount_ingredient)
+        queryset_tags = self.taking_tags(validated_data)
+        queryset_amount_ingredients = self.taking_ingredients(validated_data)
+        # тут возможно проблема с БД на SQLite3
+        delete_ingredients_in_recipe(instance)
+        # тут пока не знаю как устранить замечание (метод super())
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
