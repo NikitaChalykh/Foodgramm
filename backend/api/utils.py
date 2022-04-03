@@ -7,8 +7,8 @@ class PageLimitPaginator(PageNumberPagination):
     max_page_size = 10
 
 
-def delete_ingredients_in_recipe(recipe):
-    ingredients = recipe.ingredients.all()
-    for ingredient in ingredients:
-        if ingredient.recipes.count() == 1:
-            ingredient.delete()
+def delete_old_ingredients(recipe):
+    old_ingredients = recipe.ingredients.all()
+    for old_ingredient in old_ingredients:
+        if old_ingredient.recipes.count() == 1:
+            old_ingredient.delete()
