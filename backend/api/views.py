@@ -11,13 +11,14 @@ from rest_framework.response import Response
 from food.models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
                          ShoppingList, Tag)
 from users.models import Follow, User
+
+from .filters import IngredientFilterBackend, RecipeFilterBackend
 from .permissions import RecipePermission, UserPermission
 from .serializers import (FollowSerializer, FullRecipeSerializer,
                           IngredientSerializer, PasswordSerializer,
                           RecordRecipeSerializer, SmallRecipeSerializer,
                           TagSerializer, UserSerializer)
-from .utils import (IngredientFilterBackend, PageLimitPaginator,
-                    RecipeFilterBackend, delete_old_ingredients)
+from .utils import PageLimitPaginator, delete_old_ingredients
 
 
 class UserViewSet(
@@ -152,21 +153,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipes__shopping_list_recipes__user=request.user
         )
         shopping_list = shopping_list.values('ingredient').annotate(
-            average_amount=Sum('amount')
+            total_amount=Sum('amount')
         )
-        myfile = StringIO()
+        shopping_cart_file = StringIO()
         for position in shopping_list:
-            position_ingredient = Ingredient.objects.get(
+            position_ingredient = get_object_or_404(
+                Ingredient,
                 pk=position['ingredient']
             )
-            position_amount = position['average_amount']
-            myfile.write(
+            position_amount = position['total_amount']
+            shopping_cart_file.write(
                 f' *  {position_ingredient.name.title()}'
                 f' ({position_ingredient.measurement_unit})'
                 f' - {position_amount}' + '\n'
             )
         response = HttpResponse(
-            myfile.getvalue(),
+            shopping_cart_file.getvalue(),
             content_type='text'
         )
         response['Content-Disposition'] = (

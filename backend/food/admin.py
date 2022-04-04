@@ -49,7 +49,17 @@ class TagAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-class FavoriteShoppingListAdmin(admin.ModelAdmin):
+class ShoppingListAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'recipe'
+    )
+    list_filter = ('user', 'recipe')
+    search_fields = ('user',)
+    empty_value_display = '-пусто-'
+
+
+class FavoriteAdmin(admin.ModelAdmin):
     list_display = (
         'user',
         'recipe'
@@ -63,5 +73,5 @@ admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(AmountIngredient, AmountIngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)
-admin.site.register(FavoriteRecipe, FavoriteShoppingListAdmin)
-admin.site.register(ShoppingList, FavoriteShoppingListAdmin)
+admin.site.register(FavoriteRecipe, FavoriteAdmin)
+admin.site.register(ShoppingList, ShoppingListAdmin)

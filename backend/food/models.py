@@ -1,8 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from .validators import validate_not_negative_value
-
 User = get_user_model()
 
 
@@ -55,8 +53,7 @@ class AmountIngredient(models.Model):
         verbose_name='Название ингредиента',
         on_delete=models.CASCADE
     )
-    amount = models.IntegerField(
-        validators=[validate_not_negative_value],
+    amount = models.PositiveIntegerField(
         verbose_name='Количество ингредиента'
     )
 
@@ -105,8 +102,7 @@ class Recipe(models.Model):
         related_name='recipes',
         verbose_name='Тэги рецепта'
     )
-    cooking_time = models.IntegerField(
-        validators=[validate_not_negative_value],
+    cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления рецепта'
     )
     pub_date = models.DateTimeField(
@@ -170,10 +166,12 @@ class ShoppingList(models.Model):
         verbose_name = "Список покупок"
         verbose_name_plural = "Список покупок"
         ordering = ['user']
-        models.UniqueConstraint(
-            fields=['user', 'recipe'],
-            name='unique_shopping_list_model'
-        )
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_shopping_list_model'
+            )
+        ]
 
     def __str__(self):
         return self.user.username
