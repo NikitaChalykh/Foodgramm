@@ -176,60 +176,59 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return response
 
 
-class ShoppingCartViewSet(viewsets.ViewSet):
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def return_serialized_data(self, recipe, request):
-        serializer = SmallRecipeSerializer(
-            recipe, context={'request': request}
-        )
-        return Response(serializer.data, status.HTTP_201_CREATED)
-
-    def create(self, request, id):
+class CustomCreateAndDeleteMixin:
+    def custom_create(self, request, id, attribute, model):
         recipe = get_object_or_404(Recipe, pk=id)
-        if not recipe.shopping_list_recipes.filter(
+        queryset = getattr(recipe, attribute)
+        if not queryset.filter(
             user=request.user
         ).exists():
-            ShoppingList.objects.create(
+            model.objects.create(
                 user=request.user,
                 recipe=recipe
             )
-            return self.return_serialized_data(recipe, request)
+            serializer = SmallRecipeSerializer(
+                recipe, context={'request': request}
+            )
+            return Response(serializer.data, status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def check_and_delete_data(self, data):
+    def custom_destroy(self, request, id, attribute):
+        recipe = get_object_or_404(Recipe, pk=id)
+        queryset = getattr(recipe, attribute)
+        print(queryset)
+        data = (
+            queryset.filter(
+                user=request.user
+            )
+        )
         if data.exists():
             data.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, id):
-        recipe = get_object_or_404(Recipe, pk=id)
-        data = (
-            recipe.shopping_list_recipes.filter(
-                user=request.user
-            )
-        )
-        return self.check_and_delete_data(data)
 
-
-class FavoriteViewSet(ShoppingCartViewSet):
+class ShoppingCartViewSet(viewsets.ViewSet, CustomCreateAndDeleteMixin):
+    permission_classes = (permissions.IsAuthenticated,)
 
     def create(self, request, id):
-        recipe = get_object_or_404(Recipe, pk=id)
-        if not recipe.favorite_recipes.filter(
-            user=request.user
-        ).exists():
-            FavoriteRecipe.objects.create(
-                user=request.user,
-                recipe=recipe
-            )
-            return self.return_serialized_data(recipe, request)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        attribute = 'shopping_list_recipes'
+        model = ShoppingList
+        return self.custom_create(request, id, attribute, model)
 
     def destroy(self, request, id):
-        recipe = get_object_or_404(Recipe, pk=id)
-        data = (
-            recipe.favorite_recipes.filter(user=request.user)
-        )
-        return self.check_and_delete_data(data)
+        attribute = 'shopping_list_recipes'
+        return self.custom_destroy(request, id, attribute)
+
+
+class FavoriteViewSet(viewsets.ViewSet, CustomCreateAndDeleteMixin):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def create(self, request, id):
+        attribute = 'favorite_recipes'
+        model = FavoriteRecipe
+        return self.custom_create(request, id, attribute, model)
+
+    def destroy(self, request, id):
+        attribute = 'favorite_recipes'
+        return self.custom_destroy(request, id, attribute)
