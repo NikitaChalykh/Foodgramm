@@ -11,7 +11,6 @@ from rest_framework.response import Response
 from food.models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
                          ShoppingList, Tag)
 from users.models import Follow, User
-
 from .filters import IngredientFilterBackend, RecipeFilterBackend
 from .permissions import RecipePermission, UserPermission
 from .serializers import (FollowSerializer, FullRecipeSerializer,
