@@ -35,7 +35,7 @@ class RecipeFilterBackend(filters.BaseFilterBackend):
             review_queryset = review_queryset.filter(
                 author=recipes_author
             )
-        if recipes_tags != []:
+        if recipes_tags:
             regular_tags = '|'.join(recipes_tags)
             review_queryset = review_queryset.filter(
                 tags__slug__regex=regular_tags

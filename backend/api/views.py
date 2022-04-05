@@ -196,7 +196,6 @@ class CustomCreateAndDeleteMixin:
     def custom_destroy(self, request, id, attribute):
         recipe = get_object_or_404(Recipe, pk=id)
         queryset = getattr(recipe, attribute)
-        print(queryset)
         data = (
             queryset.filter(
                 user=request.user
