@@ -6,17 +6,21 @@ FoodGramm
 ----------
 Cайт Foodgram («Продуктовый помощник») создан для начинающих кулинаров и изысканныю гурманов.
 
-[Ссылка на размещенный проект](http://chafoodgramm.ddns.net/)
+[Ссылка на размещенный проект на боевом сервере](http://chafoodgramm.ddns.net/)
+
+Логин администратора: ```admin```
+
+Пароль администратора: ```admin```
 
 Системные требования
 ----------
-* Python 3.8+
+* Python 3.7+
 * Docker
 * Works on Linux, Windows, macOS, BSD
 
 Стек технологий
 ----------
-* Python 3.8
+* Python 3.7
 * Django 2.2
 * Rest API
 * PostgreSQL
@@ -51,11 +55,11 @@ echo DB_NAME=postgres >> .env
 
 echo POSTGRES_PASSWORD=postgres >> .env
 
-echo POSTGRES_USER=postgres  >> .env
+echo POSTGRES_USER=postgres >> .env
 
-echo DB_HOST=db  >> .env
+echo DB_HOST=db >> .env
 
-echo DB_PORT=5432  >> .env
+echo DB_PORT=5432 >> .env
 
 echo SECRET_KEY=************ >> .env
 ```
