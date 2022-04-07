@@ -1,15 +1,17 @@
 FoodGramm
+![example workflow](https://github.com/NikitaChalykh/foodgram-project-react/actions/workflows/foodgramm_workflow.yml/badge.svg)
 =====
 
 Описание проекта
 ----------
 Cайт Foodgram («Продуктовый помощник») создан для начинающих кулинаров и изысканныю гурманов.
 
-В репозитории расположены фикстуры для заполнения БД и папка media c картинками рецептов.
+[Ссылка на размещенный проект](http://chafoodgramm.ddns.net/)
 
 Системные требования
 ----------
 * Python 3.8+
+* Docker
 * Works on Linux, Windows, macOS, BSD
 
 Стек технологий
@@ -19,6 +21,11 @@ Cайт Foodgram («Продуктовый помощник») создан дл
 * Rest API
 * PostgreSQL
 * JS
+* Nginx
+* gunicorn
+* Docker
+* DockerHub
+* GitHub Actions (CI/CD)
 
 Установка проекта из репозитория (Linux и macOS)
 ----------
@@ -29,36 +36,40 @@ git clone 'git@github.com:NikitaChalykh/foodgram-project-react.git'
 
 cd foodgram-project-react
 ```
-2. Cоздать и активировать виртуальное окружение:
-```bash
-python3 -m venv env
+2. Cоздать и открыть файл ```.env``` с переменными окружения:
+```bash 
+cd infra
 
-source env/bin/activate
+touch .env
 ```
-3. Установить зависимости из файла ```requirements.txt```:
-```bash
-python3 -m pip install --upgrade pip
 
-pip install -r requirements.txt
-```
-4. Выполнить миграции:
-```bash
-cd backend
+3. Заполнить ```.env``` файл с переменными окружения по примеру (SECRET_KEY см. в файле ```settnigs.py```):
+```bash 
+echo DB_ENGINE=django.db.backends.postgresql >> .env
 
-python3 manage.py migrate
-```
-5. Заполнение БД тестовыми данными:
-```bash
-python3 manage.py loaddata fixtures.json
-```
-6. Запустить проект (в режиме сервера Django):
-```bash
-python3 manage.py runserver
-```
-7. Запустить контейнер фронтенда:
-```bash
-cd ../infra
+echo DB_NAME=postgres >> .env
 
+echo POSTGRES_PASSWORD=postgres >> .env
+
+echo POSTGRES_USER=postgres  >> .env
+
+echo DB_HOST=db  >> .env
+
+echo DB_PORT=5432  >> .env
+
+echo SECRET_KEY=************ >> .env
+```
+
+4. Установка и запуск приложения в контейнерах (контейнер web загружактся из DockerHub):
+```bash 
 docker-compose up -d
 ```
-8. Проект на локальной машине доступен по адресу ```http://localhost```.
+
+5. Запуск миграций, создание суперюзера, сбор статики и заполнение БД:
+```bash 
+docker-compose exec web python manage.py migrate
+
+docker-compose exec web python manage.py collectstatic --no-input 
+
+docker-compose exec web python manage.py loaddata fixtures.json
+```
