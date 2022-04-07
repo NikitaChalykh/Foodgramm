@@ -75,9 +75,9 @@ docker-compose up -d
 
 5. Запуск миграций, сбор статики и заполнение БД:
 ```bash 
-docker-compose exec web python manage.py migrate
+docker-compose exec backend python manage.py migrate
 
-docker-compose exec web python manage.py collectstatic --no-input 
+docker-compose exec backend python manage.py collectstatic --no-input 
 
-docker-compose exec web python manage.py loaddata fixtures.json
+docker-compose exec backend python manage.py loaddata fixtures.json
 ```
