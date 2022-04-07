@@ -21,7 +21,7 @@ Cайт Foodgram («Продуктовый помощник») создан дл
 Стек технологий
 ----------
 * Python 3.7
-* Django 2.2
+* Django 3.1
 * Rest API
 * PostgreSQL
 * JS
