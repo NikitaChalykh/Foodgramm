@@ -65,7 +65,7 @@ echo SECRET_KEY=************ >> .env
 docker-compose up -d
 ```
 
-5. Запуск миграций, создание суперюзера, сбор статики и заполнение БД:
+5. Запуск миграций, сбор статики и заполнение БД:
 ```bash 
 docker-compose exec web python manage.py migrate
 
