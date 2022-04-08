@@ -1,5 +1,5 @@
 from rest_framework import filters
-from django.db.models import Value
+from django.db.models import Value, IntegerField
 
 
 class IngredientFilterBackend(filters.BaseFilterBackend):
@@ -10,11 +10,11 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             begining_regular_name = '^' + name
             begining_regular_queryset = queryset.filter(
                 name__regex=begining_regular_name
-            ).annotate(custom_order=Value(1))
+            ).annotate(custom_order=Value(1, IntegerField()))
             end_regular_name = name + '$'
             end_regular_queryset = queryset.filter(
                 name__regex=end_regular_name
-            ).annotate(custom_order=Value(2))
+            ).annotate(custom_order=Value(2, IntegerField()))
             return begining_regular_queryset.union(
                 end_regular_queryset
             ).order_by('custom_order')
