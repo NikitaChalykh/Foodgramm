@@ -4,7 +4,7 @@ from rest_framework import filters
 class IngredientFilterBackend(filters.BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
-        name = request.query_params.get('name')
+        name = request.query_params.get('name').lower()
         if name is not None:
             begining_regular_name = '^' + name
             begining_regular_queryset = queryset.filter(
@@ -14,7 +14,7 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             end_regular_queryset = queryset.filter(
                 name__regex=end_regular_name
             )
-            queryset = begining_regular_queryset | end_regular_queryset
+            return begining_regular_queryset | end_regular_queryset
         return queryset
 
 
