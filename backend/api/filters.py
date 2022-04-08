@@ -1,3 +1,4 @@
+from django.db.models import IntegerField, Value
 from rest_framework import filters
 
 
@@ -9,11 +10,11 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             begining_regular_name = '^' + name
             begining_regular_queryset = queryset.filter(
                 name__regex=begining_regular_name
-            ).extra(select={'filter_order': 'first'})
+            ).annotate(filter_order=Value(1, IntegerField()))
             regular_name = name
             regular_queryset = queryset.filter(
                 name__regex=regular_name
-            ).extra(select={'filter_order': 'second'})
+            ).annotate(filter_order=Value(2, IntegerField()))
             return (
                 begining_regular_queryset | regular_queryset
             ).order_by('filter_order')
