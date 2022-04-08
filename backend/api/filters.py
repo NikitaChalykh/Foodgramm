@@ -6,7 +6,7 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         name = request.query_params.get('name')
         if name is not None:
-            regular_name = '^' + name
+            regular_name = '^' + name + '|' + name
             return queryset.filter(
                 name__regex=regular_name
             )
