@@ -15,9 +15,9 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             regular_queryset = queryset.filter(
                 name__regex=free_regular_name
             ).annotate(custom_order=Value(2, IntegerField()))
-            return (
-                begining_regular_queryset | regular_queryset
-            ).order_by('custom_order', 'name')
+            return begining_regular_queryset.union(
+                regular_queryset
+            ).distinct().order_by('custom_order', 'name')
         return queryset
 
 
