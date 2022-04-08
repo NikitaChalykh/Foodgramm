@@ -19,7 +19,7 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             ).annotate(custom_order=Value(2, IntegerField()))
             return begining_regular_queryset.union(
                 regular_queryset
-            ).distinct().order_by('custom_order', 'name')
+            ).order_by('custom_order', 'name')
         return queryset
 
 
