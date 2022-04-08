@@ -8,7 +8,7 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         queryset = Ingredient.objects.all()
         name = request.query_params.get('name').lower()
-        if name is not None:
+        if name is not None and len(name) >= 3:
             begining_regular_name = '^' + name
             begining_regular_queryset = queryset.filter(
                 name__regex=begining_regular_name
@@ -20,7 +20,7 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             return begining_regular_queryset.union(
                 regular_queryset
             ).distinct().order_by('custom_order', 'name')
-        # return queryset
+        return queryset
 
 
 class RecipeFilterBackend(filters.BaseFilterBackend):
