@@ -11,13 +11,13 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             begining_regular_queryset = queryset.filter(
                 name__regex=begining_regular_name
             ).annotate(custom_order=Value(1, IntegerField()))
-            end_regular_name = name + '$'
-            end_regular_queryset = queryset.filter(
-                name__regex=end_regular_name
+            free_regular_name = name
+            regular_queryset = queryset.filter(
+                name__regex=free_regular_name
             ).annotate(custom_order=Value(2, IntegerField()))
             return begining_regular_queryset.union(
-                end_regular_queryset
-            ).order_by('custom_order')
+                regular_queryset
+            ).order_by('custom_order', 'name')
         return queryset
 
 
