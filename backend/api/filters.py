@@ -1,10 +1,12 @@
 from rest_framework import filters
 from django.db.models import Value, IntegerField
+from food.models import Ingredient
 
 
 class IngredientFilterBackend(filters.BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
+        queryset = Ingredient.objects.all()
         name = request.query_params.get('name').lower()
         if name is not None:
             begining_regular_name = '^' + name
