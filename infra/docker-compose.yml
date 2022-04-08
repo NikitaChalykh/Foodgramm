@@ -24,6 +24,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
+    depends_on:
+      - backend
 
   nginx:
     image: nginx:1.19.3
@@ -36,7 +38,7 @@ services:
       - backend_static_value:/var/html/backend_static/
       - backend_media_value:/var/html/backend_media/
     depends_on:
-      - backend
+      - frontend
 
 volumes:
   backend_static_value:
