@@ -16,7 +16,7 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             ).extra(select={'filter_order': 'second'})
             return (
                 begining_regular_queryset | regular_queryset
-            ).order_by('name', 'filter_order')
+            ).order_by('filter_order')
         return queryset
 
 
