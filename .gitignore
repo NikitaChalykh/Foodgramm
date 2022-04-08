@@ -131,8 +131,6 @@ dmypy.json
 # .idea
 .idea
 
-shopping_list.txt
-data_script
 /backend/static
 .DS_Store
 .vscode/

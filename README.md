@@ -4,13 +4,17 @@ FoodGramm
 
 Описание проекта
 ----------
-Cайт Foodgram («Продуктовый помощник») создан для начинающих кулинаров и изысканныю гурманов.
+Cайт Foodgram («Продуктовый помощник») создан для начинающих кулинаров и изысканныю гурманов. 
 
-[Ссылка на размещенный проект на боевом сервере](http://chafoodgramm.ddns.net/)
+В сервисе пользователи смогут публиковать рецепты, подписываться на публикации других пользователей, добавлять понравившиеся рецепты в список «Избранное», а перед походом в магазин скачивать сводный список продуктов, необходимых для приготовления одного или нескольких выбранных блюд.
 
-Логин администратора: ```admin```
+Проект разворачивается в трех Docker контейнерах: backend-приложение API, postgresql-база данных и nginx-сервер на боевом сервере Yandex.Cloud. Контейнер с фронтендом используется только для сборки файлов. Реализовано CI и CD проекта. 
 
-Пароль администратора: ```admin```
+При пуше изменений в главную ветку проект автоматические тестируется на соотвествие требованиям PEP8. После успешного прохождения тестов, на git-платформе собирается образ web-контейнера Docker и автоматически размешается в облачном хранилище DockerHub. Размещенный образ автоматически разворачивается на боевом сервере вмете с контейнером веб-сервера nginx и базой данных PostgreSQL.
+
+[Ссылка на размещенный проект на сервере Yandex.Cloud](http://chafoodgramm.ddns.net/)
+
+Логин и пароль администратора: ```admin```
 
 Системные требования
 ----------
@@ -21,7 +25,7 @@ Cайт Foodgram («Продуктовый помощник») создан дл
 Стек технологий
 ----------
 * Python 3.7
-* Django 2.2
+* Django 3.1
 * Rest API
 * PostgreSQL
 * JS
@@ -71,9 +75,9 @@ docker-compose up -d
 
 5. Запуск миграций, сбор статики и заполнение БД:
 ```bash 
-docker-compose exec web python manage.py migrate
+docker-compose exec backend python manage.py migrate
 
-docker-compose exec web python manage.py collectstatic --no-input 
+docker-compose exec backend python manage.py collectstatic --no-input 
 
-docker-compose exec web python manage.py loaddata fixtures.json
+docker-compose exec backend python manage.py loaddata fixtures.json
 ```
