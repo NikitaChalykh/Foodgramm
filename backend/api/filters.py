@@ -14,9 +14,7 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             end_regular_queryset = queryset.filter(
                 name__regex=end_regular_name
             )
-            return (
-                begining_regular_queryset + end_regular_queryset
-            ).distinct()
+            return begining_regular_queryset | end_regular_queryset
         return queryset
 
 
