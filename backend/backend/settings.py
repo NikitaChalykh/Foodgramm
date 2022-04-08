@@ -111,8 +111,6 @@ MEDIA_URL = '/backend_media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-FIXTURE_DIRS = os.path.join(BASE_DIR, 'fixtures/')
-
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
