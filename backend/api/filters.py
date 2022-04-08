@@ -20,7 +20,7 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             return begining_regular_queryset.union(
                 regular_queryset
             ).distinct().order_by('custom_order', 'name')
-        return queryset
+        # return queryset
 
 
 class RecipeFilterBackend(filters.BaseFilterBackend):
