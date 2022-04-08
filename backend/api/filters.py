@@ -10,11 +10,13 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             begining_regular_queryset = queryset.filter(
                 name__regex=begining_regular_name
             )
-            end_regular_name = name + '$'
-            end_regular_queryset = queryset.filter(
-                name__regex=end_regular_name
+            list_begining_regular = list(begining_regular_queryset)
+            regular_name = name
+            regular_queryset = queryset.filter(
+                name__regex=regular_name
             )
-            return begining_regular_queryset | end_regular_queryset
+            list_regular = list(regular_queryset)
+            return list_begining_regular + list_regular
         return queryset
 
 
