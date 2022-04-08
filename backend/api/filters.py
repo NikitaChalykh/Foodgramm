@@ -6,15 +6,15 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         name = request.query_params.get('name')
         if name is not None:
-            begining_name = '^' + name
+            begining_regular_name = '^' + name
             begining_regular_queryset = queryset.filter(
-                name__regex=begining_name
+                name__regex=begining_regular_name
             )
-            regular_queryset = queryset.filter(
-                name__regex=name
+            end_regular_name = name + '$'
+            end_regular_queryset = queryset.filter(
+                name__regex=end_regular_name
             )
-            queryset = begining_regular_queryset + regular_queryset
-            return queryset.distinct()
+            queryset = begining_regular_queryset | end_regular_queryset
         return queryset
 
 
