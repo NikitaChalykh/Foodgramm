@@ -9,14 +9,14 @@ class IngredientFilterBackend(filters.BaseFilterBackend):
             begining_regular_name = '^' + name
             begining_regular_queryset = queryset.filter(
                 name__regex=begining_regular_name
-            ).annotate(filter_order=1)
+            ).extra(select={'filter_order': 'first'})
             regular_name = name
             regular_queryset = queryset.filter(
                 name__regex=regular_name
-            ).annotate(filter_order=2)
+            ).extra(select={'filter_order': 'second'})
             return (
                 begining_regular_queryset | regular_queryset
-            ).order_by('filter_order')
+            ).order_by('name', 'filter_order')
         return queryset
 
 
