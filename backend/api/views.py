@@ -10,14 +10,13 @@ from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from users.models import Follow, User
-from .filters import RecipeFilterBackend
+from .filters import RecipeFilterBackend, IngredientSearchFilterBackend
 from .permissions import RecipePermission, UserPermission
 from .serializers import (FollowSerializer, FullRecipeSerializer,
                           IngredientSerializer, PasswordSerializer,
                           RecordRecipeSerializer, SmallRecipeSerializer,
                           TagSerializer, UserSerializer)
 from .utils import PageLimitPaginator, delete_old_ingredients
-from rest_framework import filters
 
 
 class UserViewSet(
@@ -121,8 +120,8 @@ class TagViewSet(
 class IngredientViewSet(TagViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('^name', 'name')
+    filter_backends = (IngredientSearchFilterBackend,)
+    search_fields = ('^name', '@name')
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
