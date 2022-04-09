@@ -1,7 +1,6 @@
 FoodGramm
 ![example workflow](https://github.com/NikitaChalykh/foodgram-project-react/actions/workflows/foodgramm_workflow.yml/badge.svg)
 =====
-
 Описание проекта
 ----------
 Cайт Foodgram («Продуктовый помощник») создан для начинающих кулинаров и изысканныю гурманов. В сервисе пользователи смогут публиковать рецепты, подписываться на публикации других пользователей, добавлять понравившиеся рецепты в список «Избранное», а перед походом в магазин скачивать сводный список продуктов, необходимых для приготовления одного или нескольких выбранных блюд.
@@ -46,7 +45,6 @@ cd infra
 
 touch .env
 ```
-
 3. Заполнить ```.env``` файл с переменными окружения по примеру (SECRET_KEY см. в файле ```settnigs.py```):
 ```bash 
 echo DB_ENGINE=django.db.backends.postgresql >> .env
@@ -63,7 +61,6 @@ echo DB_PORT=5432 >> .env
 
 echo SECRET_KEY=************ >> .env
 ```
-
 4. Установка и запуск приложения в контейнерах (контейнер web загружактся из DockerHub):
 ```bash 
 docker-compose up -d
