@@ -24,11 +24,11 @@ Cайт Foodgram («Продуктовый помощник») создан дл
 * Django 3.1
 * Rest API
 * PostgreSQL
-* JS
 * Nginx
 * gunicorn
 * Docker
 * DockerHub
+* JS
 * GitHub Actions (CI/CD)
 
 Установка проекта из репозитория (Linux и macOS)
