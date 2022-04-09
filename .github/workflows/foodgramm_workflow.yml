@@ -58,9 +58,8 @@ jobs:
             script: |
               cd foodgram-project-react/infra
               sudo docker-compose stop
-              sudo docker-compose rm backend
-              y
-              sudo docker rmi nikita223613/foodgramm_backend
+              sudo docker container rm infra_backend_1
+              sudo docker rmi nikita223613/foodgramm_backend:latest
               touch .env
               echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
               echo DB_NAME=${{ secrets.DB_NAME }} >> .env
