@@ -59,7 +59,7 @@ jobs:
               cd foodgram-project-react/infra
               sudo docker-compose stop
               sudo docker-compose rm backend
-              sudo docker rmi nikita223613/foodgramm_backend:latest -f
+              cnikita223613/foodgramm_backend -f
               touch .env
               echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
               echo DB_NAME=${{ secrets.DB_NAME }} >> .env
@@ -67,7 +67,7 @@ jobs:
               echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
               echo DB_HOST=${{ secrets.DB_HOST }} >> .env
               echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-              sudo docker-compose up -d --build 
+              sudo docker-compose up -d
   
   send_message:
     runs-on: ubuntu-latest
