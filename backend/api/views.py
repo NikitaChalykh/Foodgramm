@@ -121,7 +121,7 @@ class IngredientViewSet(TagViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = (IngredientSearchFilterBackend,)
-    search_fields = ('^name', '@name')
+    search_fields = ('^name', 'name')
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
