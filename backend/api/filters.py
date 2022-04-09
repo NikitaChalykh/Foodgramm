@@ -2,7 +2,7 @@ from rest_framework import filters
 
 
 class IngredientSearchFilterBackend(filters.SearchFilter):
-    search_title = 'name'
+    search_param = 'name'
 
 
 class RecipeFilterBackend(filters.BaseFilterBackend):
