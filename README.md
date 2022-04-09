@@ -38,7 +38,7 @@ Cайт Foodgram («Продуктовый помощник») создан дл
 ```bash
 git clone 'git@github.com:NikitaChalykh/foodgram-project-react.git'
 
-cd foodgram-project-react
+cd Foodgramm
 ```
 2. Cоздать и открыть файл ```.env``` с переменными окружения:
 ```bash 
