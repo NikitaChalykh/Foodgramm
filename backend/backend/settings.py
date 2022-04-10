@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default=')h@+luvguw*z4ug83b3@jlmyk=6+0t3)s(
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'food.apps.FoodConfig',
