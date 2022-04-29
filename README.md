@@ -45,7 +45,7 @@ cd infra
 
 touch .env
 ```
-3. Заполнить ```.env``` файл с переменными окружения по примеру (SECRET_KEY см. в файле ```settnigs.py```):
+3. Заполнить ```.env``` файл с переменными окружения по примеру:
 ```bash 
 echo DB_ENGINE=django.db.backends.postgresql >> .env
 
@@ -58,8 +58,6 @@ echo POSTGRES_USER=postgres >> .env
 echo DB_HOST=db >> .env
 
 echo DB_PORT=5432 >> .env
-
-echo SECRET_KEY=************ >> .env
 ```
 4. Установка и запуск приложения в контейнерах (контейнер backend загружактся из DockerHub):
 ```bash 
