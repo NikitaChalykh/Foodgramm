@@ -35,7 +35,7 @@ Cайт Foodgram («Продуктовый помощник») создан дл
 
 1. Клонировать репозиторий и перейти в него в командной строке:
 ```bash
-git clone 'git@github.com:NikitaChalykh/foodgram-project-react.git'
+git clone git@github.com:NikitaChalykh/Foodgramm.git
 
 cd Foodgramm
 ```
