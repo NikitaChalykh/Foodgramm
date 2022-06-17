@@ -1,6 +1,7 @@
 Сервис FoodGramm «Продуктовый помощник» 
 ![example workflow](https://github.com/NikitaChalykh/foodgram-project-react/actions/workflows/foodgramm_workflow.yml/badge.svg)
 =====
+
 Описание проекта
 ----------
 Проект создан в рамках учебного курса Яндекс.Практикум.
