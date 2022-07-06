@@ -75,3 +75,5 @@ docker-compose exec backend python manage.py collectstatic --no-input
 
 docker-compose exec backend python manage.py loaddata fixtures.json
 ```
+
+
