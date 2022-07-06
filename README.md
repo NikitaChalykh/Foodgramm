@@ -77,3 +77,6 @@ docker-compose exec backend python manage.py loaddata fixtures.json
 ```
 
 
+
+
+
